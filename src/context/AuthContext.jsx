@@ -1,4 +1,4 @@
-import { createContext, useContext, useReducer, useCallback } from 'react'
+import { createContext, useContext, useReducer, useCallback, useEffect } from 'react'
 
 // ─── Constants ────────────────────────────────────────────────────────────────
 
@@ -82,6 +82,17 @@ function reducer(state, action) {
       localStorage.removeItem(LS_AUTH_KEY)
       return { ...state, user: null }
     }
+    // Server confirmed subscription is still active — refresh local token
+    case 'REFRESH_FROM_SERVER': {
+      const token = {
+        email:  action.email,
+        plan:   'pro',
+        iat:    Date.now(),
+        exp:    action.expiresAt ?? (Date.now() + 30 * 86_400_000),
+      }
+      localStorage.setItem(LS_AUTH_KEY, JSON.stringify(token))
+      return { ...state, user: token }
+    }
     case 'OPEN_PRICING':
       return { ...state, pricingOpen: true, upgradeFeature: action.feature ?? null }
     case 'CLOSE_PRICING':
@@ -97,6 +108,28 @@ const AuthContext = createContext(null)
 
 export function AuthProvider({ children }) {
   const [state, dispatch] = useReducer(reducer, initialState)
+
+  // On mount: if there's a stored email, verify subscription status with server.
+  // Uses cached localStorage value while loading (no flicker), then corrects silently.
+  useEffect(() => {
+    const token = readToken()
+    if (!token?.email) return
+
+    fetch(`/api/subscription?email=${encodeURIComponent(token.email)}`)
+      .then(r => r.json())
+      .then(data => {
+        if (data.status === 'no_db') return  // Server without DB — trust localStorage
+        if (data.isPro) {
+          dispatch({ type: 'REFRESH_FROM_SERVER', email: token.email, expiresAt: data.expiresAt })
+        } else {
+          dispatch({ type: 'LOGOUT' })
+        }
+      })
+      .catch(() => {
+        // Server unreachable — keep local token as fallback
+      })
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   const isPro = useCallback(() => state.user?.plan === 'pro', [state.user])
 
