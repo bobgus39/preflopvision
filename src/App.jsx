@@ -12,6 +12,7 @@ import ProGate from './components/ProGate'
 import PricingModal from './components/PricingModal'
 import AffiliateBar from './components/AffiliateBar'
 import PdfExportModal from './components/PdfExportModal'
+import LoginModal from './components/LoginModal'
 import { ranges, SITUATIONS_BY_POSITION } from './data/ranges'
 import { useAuth } from './context/AuthContext'
 
@@ -80,6 +81,7 @@ export default function App() {
       <div className="min-h-screen bg-bg text-cream font-body">
         <div className="hero-glow" />
         <PricingModal />
+        <LoginModal />
         <Header
           gameType={gameType} setGameType={setGameType}
           stackDepth={stackDepth} setStackDepth={setStackDepth}
@@ -96,8 +98,9 @@ export default function App() {
     <div className="min-h-screen bg-bg text-cream font-body">
       <div className="hero-glow" />
 
-      {/* Global pricing modal — rendered once at root level */}
+      {/* Global modals — rendered once at root level */}
       <PricingModal />
+      <LoginModal />
 
       <Header
         gameType={gameType} setGameType={setGameType}

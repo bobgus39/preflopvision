@@ -52,6 +52,7 @@ const initialState = {
   user:         readToken(),
   pricingOpen:  false,
   upgradeFeature: null, // hint for which feature triggered the modal
+  loginOpen:    false,
 }
 
 function reducer(state, action) {
@@ -97,6 +98,10 @@ function reducer(state, action) {
       return { ...state, pricingOpen: true, upgradeFeature: action.feature ?? null }
     case 'CLOSE_PRICING':
       return { ...state, pricingOpen: false, upgradeFeature: null }
+    case 'OPEN_LOGIN':
+      return { ...state, loginOpen: true }
+    case 'CLOSE_LOGIN':
+      return { ...state, loginOpen: false }
     default:
       return state
   }
@@ -158,6 +163,8 @@ export function AuthProvider({ children }) {
 
   const openPricing      = useCallback((feature) => dispatch({ type: 'OPEN_PRICING', feature }), [])
   const closePricing     = useCallback(() => dispatch({ type: 'CLOSE_PRICING' }), [])
+  const openLogin        = useCallback(() => dispatch({ type: 'OPEN_LOGIN' }), [])
+  const closeLogin       = useCallback(() => dispatch({ type: 'CLOSE_LOGIN' }), [])
   const login            = useCallback((email, plan) => dispatch({ type: 'LOGIN', email, plan }), [])
   // Called after verifying a real Stripe session on the success page
   const loginFromStripe  = useCallback((email, expiresAt) => dispatch({ type: 'LOGIN_STRIPE', email, expiresAt }), [])
@@ -168,10 +175,13 @@ export function AuthProvider({ children }) {
     user: state.user,
     pricingOpen: state.pricingOpen,
     upgradeFeature: state.upgradeFeature,
+    loginOpen: state.loginOpen,
     isPro,
     isLocked,
     openPricing,
     closePricing,
+    openLogin,
+    closeLogin,
     login,
     loginFromStripe,
     logout,

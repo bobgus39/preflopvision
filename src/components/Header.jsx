@@ -4,7 +4,7 @@ import { useAuth } from '../context/AuthContext'
 const STACK_DEPTHS = ['100bb', '50bb', '25bb']
 
 export default function Header({ gameType, setGameType, stackDepth, setStackDepth, quizMode, setQuizMode, onOpenPdfExport }) {
-  const { user, isPro, openPricing, logout, isLocked } = useAuth()
+  const { user, isPro, openPricing, openLogin, logout, isLocked } = useAuth()
 
   function handleStackDepth(depth) {
     // MTT 50bb/25bb is Pro-only
@@ -113,7 +113,7 @@ export default function Header({ gameType, setGameType, stackDepth, setStackDept
           <span className="hidden sm:inline">{quizMode ? 'Reference' : 'Quiz'}</span>
         </motion.button>
 
-        {/* Plan badge */}
+        {/* Plan badge / auth controls */}
         {isPro() ? (
           <motion.div
             initial={{ opacity: 0, scale: 0.9 }}
@@ -140,19 +140,30 @@ export default function Header({ gameType, setGameType, stackDepth, setStackDept
             </button>
           </motion.div>
         ) : (
-          <motion.button
-            onClick={() => openPricing()}
-            className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-bold border border-gold/30 bg-gold/10 text-gold hover:bg-gold/20 hover:border-gold/50 transition-all"
-            whileHover={{ scale: 1.02 }}
-            whileTap={{ scale: 0.98 }}
-            title="Actualizar a Plan Pro"
-          >
-            <span className="text-[10px] text-cream-muted font-normal hidden sm:inline border border-gold/15 px-1.5 py-0.5 rounded bg-surface">
-              FREE
-            </span>
-            <span className="hidden sm:inline">→ Pro</span>
-            <span className="sm:hidden">Pro ✦</span>
-          </motion.button>
+          <div className="flex items-center gap-1.5">
+            <motion.button
+              onClick={openLogin}
+              className="hidden sm:flex items-center px-2.5 py-2 rounded-lg text-xs font-semibold border border-gold/15 bg-surface text-cream-dim hover:text-cream hover:border-gold/30 transition-all"
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+              title="Iniciar sesión"
+            >
+              Acceder
+            </motion.button>
+            <motion.button
+              onClick={() => openPricing()}
+              className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-bold border border-gold/30 bg-gold/10 text-gold hover:bg-gold/20 hover:border-gold/50 transition-all"
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+              title="Actualizar a Plan Pro"
+            >
+              <span className="text-[10px] text-cream-muted font-normal hidden sm:inline border border-gold/15 px-1.5 py-0.5 rounded bg-surface">
+                FREE
+              </span>
+              <span className="hidden sm:inline">→ Pro</span>
+              <span className="sm:hidden">Pro ✦</span>
+            </motion.button>
+          </div>
         )}
       </div>
     </header>
